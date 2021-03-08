@@ -1,12 +1,12 @@
 import React from "react";
 import Login from "./Login";
-import Logout from "./Logout";
+import Register from "./Register";
 
 const AuthHandler = () => {
   return (
     <>
       <Login />
-      <Logout />
+      <Register />
     </>
   );
 };

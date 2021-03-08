@@ -1,7 +1,8 @@
-// define the input types of users
-interface User {
-    username:string;
-    password:string;
+import * as mongoose from 'mongoose';
+
+interface IUser extends mongoose.Document {
+  username: string;
+  password: string;
 }
 
-export default User;
+export default IUser;

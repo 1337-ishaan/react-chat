@@ -19,7 +19,7 @@ export const UserSchema = new Schema({
   messages: [
     {
       sentBy: String,
-      messageContent: String || { data: Buffer, contentType: String }, // incase it can be a string or file or a photo
+      messageContent: String || { data: Buffer, contentType: String }, // incase it can be a string or file or image
     },
   ],
 });

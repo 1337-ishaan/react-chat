@@ -1,22 +1,55 @@
 import express from "express";
-import {connect} from './db';
-import * as dotenv from 'dotenv'
+import { connect } from "./db";
+import * as dotenv from "dotenv";
+import cors from "cors";
+import { UserModel } from "./users/users.model";
+import * as mongoose from "mongoose";
 
-var app = express();
+connect();
+const app = express();
+app.use(cors());
 const PORT = 3010;
 const router = express.Router();
+app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json("Hello World");
+});
 
+// if username in db => check password, else return "not registered"
+// if password doesnt match, return "please check the credentials"
 
-connect()
-const chatHistory = router.post('/chat-history', (req,res) => res.send("chat-history"))
+app.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await UserModel.findOne({ username });
+  if (user) {
+    res.status(500);
+    res.json({
+      message: "User already registered",
+    });
+  }
+  res.json({ username, password });
+  await UserModel.create({ username, password });
+});
 
-router.get('/profile-highlighted', (req,res) => res.send("profile-highlighted"))
-app.get('/', (req,res) => {
-    res.send("Hello World");
-})
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await UserModel.findOne({ username });
+  if (!user) {
+    res.status(500);
+    res.json({ message: "User not registered" });
+    return;
+  } else {
+    if (user?.password === password) {
+      res.json({ message: "Logged in successfully" });
+      return;
+    } else {
+      res.status(500);
+      res.json({ message: "Please check your username or password" });
+    }
+  }
+});
 
 app.listen(PORT, () => console.log(`server running at port ${PORT}`));
 
-
-export {router};
+export { router };
