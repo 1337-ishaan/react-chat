@@ -33,7 +33,7 @@ const Contacts = () => {
   return (
     <>
       {userData.map((friends, i) => (
-        <div className="flex rounded-full shadow m-3 justify-start p-3 pr-3">
+        <div className="flex hover:shadow-inner rounded-full shadow m-3 justify-start p-3 pr-3">
           <img
             src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png"
             alt="user"
