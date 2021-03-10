@@ -50,6 +50,15 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/fetch", async (req,res) => {
+  UserModel.find({}, (err,result) => {
+    err ? res.send(err) : res.send(result)
+    console.log(result)
+  } )
+
+})
+
+
 app.listen(PORT, () => console.log(`server running at port ${PORT}`));
 
 export { router };

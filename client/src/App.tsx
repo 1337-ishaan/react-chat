@@ -7,6 +7,12 @@ import ChatScreen from "./modules/ChatScreen/ChatScreen";
 import SelectedContactInfo from "./modules/SelectedContactInfo/SelectedContactInfo";
 
 const App = () => {
+  useEffect(() => {
+    fetch()
+  },[])
+
+
+
   return (
     <div className="App">
       <div className="flex">
