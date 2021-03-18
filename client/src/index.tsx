@@ -6,18 +6,23 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { combineReducers, createStore, applyMiddleware } from "redux";
 import { authReducer } from "./store/reducers/auth";
+import { usersReducer } from "./store/reducers/users";
+
 import { composeWithDevTools } from "redux-devtools-extension";
 import thunk from "redux-thunk";
 
-const initial = {};
-const reducer = combineReducers({
+const rootReducer = combineReducers({
   authReducer,
+  usersReducer,
+  // selectedUserReducer
 });
+
+export type RootState = ReturnType<typeof rootReducer>
 
 console.log(authReducer);
 const storeRoot = createStore(
-  reducer,
-  initial,
+  rootReducer,
+  // initial,
   composeWithDevTools(applyMiddleware(thunk))
 );
 

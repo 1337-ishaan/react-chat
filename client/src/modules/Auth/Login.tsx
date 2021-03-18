@@ -1,19 +1,16 @@
 import * as React from "react";
 import AuthInput from "../utils/AuthInput";
-import { useSelector, useDispatch, shallowEqual } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { LOGIN } from "../../store/types/actionTypes";
 
 const Login = (props: any) => {
-  const checkAuth = useSelector((state) => state);
+  // const { isAuthenticated } = useSelector((state: any) => state.authReducer);
+  // const footSelector = createSelector([state] => state.get('selectedFoot'));
   const dispatch = useDispatch();
-
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  console.log(dispatch);
-  console.log(checkAuth);
 
-  console.log(username, password);
   const loginUser = () => {
     fetch("http://172.105.61.111:3010/login", {
       method: "POST",
@@ -23,6 +20,10 @@ const Login = (props: any) => {
       body: JSON.stringify({ username, password }),
     })
       .then((res) => res.json())
+      .then(
+        (res) =>
+          res.status === 200 && dispatch({ type: LOGIN, payload: { username, }})
+      )
       .then((json) => console.log(json));
   };
 
