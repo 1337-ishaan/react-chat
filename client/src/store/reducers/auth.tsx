@@ -3,7 +3,7 @@ import { store } from "../store";
 
 const initialState = {
   isAuthenticated: false,
-  username: "",
+  username: null,
   password: "",
 };
 
@@ -16,6 +16,7 @@ export const authReducer = (state = store, action: any) => {
         ...state,
         isAuthenticated: true,
         username: action.payload.username,
+        user:action.payload
       };
     case actionTypes.LOGOUT:
       return {

@@ -13,6 +13,7 @@ const Contacts = ({ filteredUsers }: any) => {
     (state: RootState) => state.usersReducer
   );
 
+  // const { user } = useSelector((state: RootState) => state.authReducer);
   // const {selectedUser} = useSelector((state : RootState) => state.selectedUserReducer)
 
   const dispatch = useDispatch();
@@ -20,16 +21,46 @@ const Contacts = ({ filteredUsers }: any) => {
   console.log(selectedUser, "selectedUser");
   console.log(userData, "contacts userdata");
 
-  const onUsernameSelection = (username: string) => {
+  const onUsernameSelection = (user: any) => {
     setIsUsernameSelected(true);
-    socket.auth = { username };
+    dispatch({
+      type: SELECT_USER,
+      payload: { selectedUser: user },
+    });
+
+
+    socket.receiverId = selectedUser?._id;
+    // get both the ids and pass it to backend
+    
+    // start socket and exchange messages and also store in db
+
+
+    // socket.selectedUserId = selectedUser?._id;
     console.log(socket.auth);
     socket.connect();
   };
+// console.log(selectedUser)
+  socket.on("users", (users: any) => {
+    console.log(users, "users ");
+    userData.forEach((user: any) => {
+      socket.userId = user._id;
+      // TODO: toastify the username when active
+      console.log(user);
+    });
+    console.log(socket);
+    // put the current user first, and then sort by username
+    users = users.sort((a: any, b: any) => {
+      if (a.self) return -1;
+      if (b.self) return 1;
+      if (a.username < b.username) return -1;
+      return a.username > b.username ? 1 : 0;
+    });
+  });
 
   socket.on("user connected", (user: any) => {
     // initReactiveProperties(user);
     // users.push(user);
+    socket.userId = userData._id
   });
 
   socket.on("connect_error", (err: any) => {
@@ -49,12 +80,7 @@ const Contacts = ({ filteredUsers }: any) => {
         filteredUsers.map((friends: IUser, i: number) => (
           <div
             key={i}
-            onClick={() =>
-              dispatch({
-                type: SELECT_USER,
-                payload: { selectedUser: friends },
-              })
-            }
+            onClick={() => onUsernameSelection(friends)}
             className="flex hover:shadow-inner rounded-full shadow m-3 justify-start p-3 pr-3"
           >
             <img

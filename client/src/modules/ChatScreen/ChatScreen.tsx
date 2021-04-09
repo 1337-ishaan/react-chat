@@ -1,34 +1,41 @@
 import React, { useState } from "react";
 import socket from "../../socket";
-// const socket = require("socket.io-client");
+import { RootState } from "../../index";
+import { useSelector } from "react-redux";
 
 const ChatScreen = () => {
-  socket.on("users", (users: any) => {
-    users.forEach((user: any) => {
-      user.self = user.userID === socket.id;
-      // initReactiveProperties(user);
-    });
-    // put the current user first, and then sort by username
-    users = users.sort((a: any, b: any) => {
-      if (a.self) return -1;
-      if (b.self) return 1;
-      if (a.username < b.username) return -1;
-      return a.username > b.username ? 1 : 0;
-    });
-  });
+  const [messageToSend, setMessageToSend] = useState("");
+  const { userData, selectedUser } = useSelector(
+    (state: RootState) => state.usersReducer
+  );
 
-  // const onMessage = (content) => {
-  //   if (this.selectedUser) {
-  //     socket.emit("private message", {
-  //       content,
-  //       to: this.selectedUser.userID,
-  //     });
-  //     this.selectedUser.messages.push({
-  //       content,
-  //       fromSelf: true,
-  //     });
-  //   }
-  // };
+  const { user, username } = useSelector(
+    (state: RootState) => state.authReducer
+  );
+  console.log(user, userData, "usernaem");
+
+  const onMessage = (content: any) => {
+    console.log("messaging here");
+    if (selectedUser) {
+      socket.senderId = user._id;
+      socket.receiverId = selectedUser._id;
+      console.log(socket,"set selectedUser in socket")   
+      // socket.on("private message", () => {
+      console.log("socket message sent");
+      socket.emit("private message",{
+        sender: socket.senderId,
+        content,
+        receiver: socket.receiverId,
+      });
+      // });
+      user.messages = [
+        {
+          content,
+          fromSelf: true,
+        },
+      ];
+    }
+  };
 
   const [myMessages, setMyMessages] = useState([
     {
@@ -79,10 +86,12 @@ const ChatScreen = () => {
       ))}
       <div className="mb-3 pt-0">
         <input
+          onChange={(e) => setMessageToSend(e.target.value)}
           type="text"
           placeholder="Type..."
           className="rounded-full px-3 py-3 w-3/5 placeholder-gray-400 text-gray-700 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-11/12 bottom-0"
         />
+        <button onClick={() => onMessage(messageToSend)}>Send Message</button>
       </div>
     </>
   );

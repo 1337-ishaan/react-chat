@@ -1,7 +1,8 @@
 import * as React from "react";
-import AuthInput from "../utils/AuthInput";
+import {RootState} from "../../index";
 import { useSelector, useDispatch } from "react-redux";
 import { LOGIN } from "../../store/types/actionTypes";
+import socket from "../../socket";
 
 const Login = (props: any) => {
   // const { isAuthenticated } = useSelector((state: any) => state.authReducer);
@@ -10,6 +11,14 @@ const Login = (props: any) => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
+  const { user } = useSelector((state: RootState) => state.authReducer);
+
+
+  const onUsernameSelection = (user:any) => {
+    socket.auth = { user };
+    // socket.senderId = user?._id;
+    socket.connect();
+  };
 
   const loginUser = () => {
     fetch("http://172.105.61.111:3010/login", {
@@ -22,8 +31,9 @@ const Login = (props: any) => {
       .then((res) => res.json())
       .then(
         (res) =>
-          res.status === 200 && dispatch({ type: LOGIN, payload: { username, }})
+          res.status === 200 && dispatch({ type: LOGIN, payload: res.user })
       )
+      .then(() => onUsernameSelection(username))
       .then((json) => console.log(json));
   };
 

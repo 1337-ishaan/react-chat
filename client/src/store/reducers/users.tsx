@@ -18,6 +18,7 @@ export const usersReducer = (state = store, action: any) => {
       return {
         ...state,
         selectedUser: action.payload.selectedUser,
+        
       };
     default:
       return {

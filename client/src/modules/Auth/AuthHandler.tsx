@@ -3,6 +3,8 @@ import Login from "./Login";
 import Register from "./Register";
 
 const AuthHandler = () => {
+  
+  
   return (
     <>
       <Login />

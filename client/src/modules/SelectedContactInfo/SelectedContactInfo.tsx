@@ -2,12 +2,19 @@ import React from "react";
 import { LOGOUT } from "../../store/types/actionTypes";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../index";
+import socket from "../../socket";
 
 const SelectedContactInfo = () => {
   // const username={}
+
+  const logoutUser = () => {
+    dispatch({ type: LOGOUT });
+    socket.disconnect();
+  };
+
   const { username } = useSelector((state: RootState) => state.authReducer);
   const dispatch = useDispatch();
-    console.log(username, "username in selectedContact");
+  console.log(username, "username in selectedContact");
   return (
     <div className="flex flex-col text-center">
       <div className="m-auto">
@@ -18,7 +25,7 @@ const SelectedContactInfo = () => {
         />
       </div>
       <div>{username}</div>
-      <button onClick={() => dispatch({ type: LOGOUT })}>LOGOUT</button>
+      <button onClick={logoutUser}>LOGOUT</button>
     </div>
   );
 };
