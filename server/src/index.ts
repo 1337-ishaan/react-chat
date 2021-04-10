@@ -2,63 +2,81 @@ import express from "express";
 import { connect } from "./db";
 import * as dotenv from "dotenv";
 import cors from "cors";
-import { UserModel } from "./users/users.model";
+import { UserModel, MessagesModel } from "./users/users.model";
 import * as mongoose from "mongoose";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
+const http = require("http");
+const socket = require("socket.io");
 
-const httpServer = createServer();
-const io = new Server(httpServer, {
+
+const app = express();
+app.use(cors());
+
+const server = createServer(app);
+// const httpServer = require("http").createServer(app);
+const io = require("socket.io")(server, {
   cors: {
-    origin: "http://172.105.61.111:3000/",
+    origin: "http://172.105.61.111:3000",
   },
 });
 
-io.on("connection", (socket: Socket) => {
-  console.log("user connected");
-  socket.emit("message", "Hello World");
-  socket.on("disconnected", () => {
-    console.log({ socket });
-    console.log("user disconnected");
+io.on("connection", (socket: any) => {
+  socket.on("chat message", (msg: any) => {
+    console.log("message: " + msg);
   });
-  socket.on("chatmessage", (msg: any) => io.emit(msg));
 });
 
-// httpServer.listen(3001);
-io.use((socket: any, next) => {
-  const username = socket.handshake.auth.username;
-  if (!username) return next(new Error("invalid username"));
+io.use((socket: any, next: any) => {
+  console.log(socket);
+  const username = socket.handshake.auth.user;
+  console.log(username);
+  if (!username) {
+    return next(new Error("invalid username"));
+  }
   socket.username = username;
   next();
 });
 
-// add "downlevelIteration": true, in tsconfig
-io.on("connection", (socket) => {
+io.on("connection", (socket: any) => {
   const users = [];
   for (let [id, socket] of io.of("/").sockets) {
     users.push({
       userID: id,
-      // username:socket.username,
+      username: socket.username,
     });
   }
   socket.emit("users", users);
   // ...
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: any) => {
   // notify existing users
-  socket.broadcast.emit("user connected", {
-    userID: socket.id,
-    // username: socket.username,
-  });
+  socket.on("user connected", () => ({
+    userID: socket.userId,
+    username: socket.username,
+  }));
 });
 
+io.on("connection", (socket: any) => {
+  socket.on("private message",async ({ sender, content, receiver }: any) => {
+    io.to(receiver).emit(content);
+    
+    // TODO: check this out 
+    // const user = await UserModel.findOne({ sender });
+    MessagesModel.create({ sender, receiver, content })
+    console.log(sender, content, receiver, "data stored in mongodb ");
+    
+    // await messages.create({})
+  });
+});
+// get the content and id of the user to be sent
+
+// store in messages named schema
+
+// emit socket.io and send it there
+
 connect();
-
-const app = express();
-
-app.use(cors());
-
 const PORT = 3010;
 
 app.use(express.json());
@@ -90,7 +108,8 @@ app.post("/login", async (req, res) => {
     return;
   } else {
     if (user?.password === password) {
-      res.json({ status: 200, message: "Logged in successfully" });
+      res.json({ status: 200, user, message: "Logged in successfully" });
+      // res.send(user)
       return;
     } else {
       res.status(500);
@@ -107,4 +126,4 @@ app.get("/data", async (req, res) => {
   });
 });
 
-app.listen(PORT, () => console.log(`server running at port ${PORT}`));
+server.listen(PORT, () => console.log(`server running at port ${PORT}`));
