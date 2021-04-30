@@ -10,28 +10,22 @@ import { useSelector, useDispatch } from "react-redux";
 import { FETCH_USERS } from "./store/types/actionTypes";
 // import RootState from './index';
 import { io } from "socket.io-client/build/index";
-import socket  from "./socket";
+import socket from "./socket";
 
 const App = () => {
   // const [users, setUsers] = useState();
   const users = useFetch("http://172.105.61.111:3010/data");
+  const messagesData = useFetch("http://172.105.61.111:3010/messages");
+  console.table(messagesData);
   const [searchField, setSearchField] = useState("");
   const { isAuthenticated } = useSelector(
     (state: RootState) => state.authReducer
   );
   const { userData } = useSelector((state: RootState) => state.usersReducer);
 
-  useEffect(() => {
-    const [name, room] = ["Ishaan", 12];
-    console.log(room);
-    // let socket = io("http://172.105.61.111:3010");
-    console.log(socket);
-    socket.emit("chat message", "Ishaan heree");
-  });
-
   console.log(userData, "user  data");
   const dispatch = useDispatch();
-  // console.log(username, "USERNAME")
+
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchField(e.target.value);
   };
@@ -57,6 +51,7 @@ const App = () => {
         <Home
           filteredUsers={filteredUsers}
           onSearchChange={onSearchChange}
+          messagesData = {messagesData}
           searchField={searchField}
         />
       )}

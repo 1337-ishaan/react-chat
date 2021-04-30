@@ -13,10 +13,15 @@ const SelectedContactInfo = () => {
   };
 
   const { username } = useSelector((state: RootState) => state.authReducer);
+  const { selectedUser } = useSelector((state: RootState) => state.usersReducer);
+
   const dispatch = useDispatch();
+
+console.log(selectedUser, "selectedUser");
   console.log(username, "username in selectedContact");
   return (
     <div className="flex flex-col text-center">
+
       <div className="m-auto">
         <img
           src="https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg"
@@ -24,7 +29,7 @@ const SelectedContactInfo = () => {
           alt="username"
         />
       </div>
-      <div>{username}</div>
+  <div>{username} & { selectedUser && selectedUser?.username}</div>
       <button onClick={logoutUser}>LOGOUT</button>
     </div>
   );

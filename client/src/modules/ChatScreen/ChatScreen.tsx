@@ -1,89 +1,75 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import socket from "../../socket";
 import { RootState } from "../../index";
 import { useSelector } from "react-redux";
 
-const ChatScreen = () => {
+const ChatScreen = ({ messagesData }: any) => {
   const [messageToSend, setMessageToSend] = useState("");
   const { userData, selectedUser } = useSelector(
     (state: RootState) => state.usersReducer
   );
 
-  const { user, username } = useSelector(
-    (state: RootState) => state.authReducer
-  );
-  console.log(user, userData, "usernaem");
+  const { user } = useSelector((state: RootState) => state.authReducer);
+  console.log(user, userData, "username");
+
+  // useEffect(() => {
+  //   for (let key in messagesData) {
+  //     if (messagesData[key].sender === user._id) {
+  //       setSenderMessages([messagesData[key]]);
+  //     }
+  //     if (messagesData[key].receiver === (selectedUser && selectedUser._id)) {
+  //       setReceiverMessages([...receiverMessages, messagesData[key]]);
+  //     }
+  //   }
+  // }, [messagesData]);
 
   const onMessage = (content: any) => {
     console.log("messaging here");
     if (selectedUser) {
       socket.senderId = user._id;
       socket.receiverId = selectedUser._id;
-      console.log(socket,"set selectedUser in socket")   
+      console.log(socket, "set selectedUser in socket");
       // socket.on("private message", () => {
       console.log("socket message sent");
-      socket.emit("private message",{
+      socket.emit("private message", {
         sender: socket.senderId,
         content,
         receiver: socket.receiverId,
       });
-      // });
-      user.messages = [
-        {
-          content,
-          fromSelf: true,
-        },
-      ];
     }
   };
 
-  const [myMessages, setMyMessages] = useState([
-    {
-      message: "Hey",
-      timestamp: new Date(),
-    },
-    {
-      message: "Im good",
-      timestamp: new Date(),
-    },
-    {
-      message: "how are you",
-      timestamp: new Date(),
-    },
-  ]);
-
-  const [receivedMessages, setReceivedMessages] = useState([
-    {
-      message: "Hii",
-      timestamp: new Date(),
-    },
-    {
-      message: "Yeah im good",
-      timestamp: new Date(),
-    },
-    {
-      message: "yo",
-      timestamp: new Date(),
-    },
-  ]);
   return (
     <>
-      {myMessages.map((text, i) => (
-        <div
-          className="w-2/4 m-3 p-3 rounded-r-lg rounded-full shadow-xl float-right"
-          key={i}
-        >
-          {text.message}
-        </div>
-      ))}
-      {receivedMessages.map((text, i) => (
-        <div
-          className="w-2/4 m-3 p-3 rounded-l-lg float-left rounded-full shadow-xl"
-          key={i}
-        >
-          {text.message}
-        </div>
-      ))}
+      {messagesData &&
+        messagesData.map((data: any, i: number) =>
+          // map all the message data but we only need to see if the
+          data.sender === user._id ? (
+            // data.receiver === (selectedUser && selectedUser._id)) &&
+            <>
+              <div
+                className={`w-2/4 m-3 p-3 rounded-r-lg rounded-full shadow-xl float-right text-green-500 `}
+                key={i}
+              >
+                {data.content}
+              </div>
+              {/* <div>Receiver - {data.receiver}</div>
+                <div>Sender - {data.sender}</div> */}
+            </>
+          ) : (
+            <>
+              <div
+                className={`w-2/4 m-3 p-3 rounded-r-lg rounded-full shadow-xl float-left text-white`}
+                key={i}
+              >
+                {data.content}
+              </div>
+              {/* <div>Receiver - {data.receiver}</div>
+                <div>Sender - {data.sender}</div> */}
+            </>
+          )
+        )}
+
       <div className="mb-3 pt-0">
         <input
           onChange={(e) => setMessageToSend(e.target.value)}

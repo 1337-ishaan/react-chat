@@ -40,22 +40,21 @@ const Contacts = ({ filteredUsers }: any) => {
     socket.connect();
   };
 // console.log(selectedUser)
-  socket.on("users", (users: any) => {
-    console.log(users, "users ");
-    userData.forEach((user: any) => {
-      socket.userId = user._id;
-      // TODO: toastify the username when active
-      console.log(user);
-    });
-    console.log(socket);
-    // put the current user first, and then sort by username
-    users = users.sort((a: any, b: any) => {
-      if (a.self) return -1;
-      if (b.self) return 1;
-      if (a.username < b.username) return -1;
-      return a.username > b.username ? 1 : 0;
-    });
-  });
+  // socket.on("users", (users: any) => {
+  //   console.log(users, "users ");
+  //   userData.forEach((user: any) => {
+  //     socket.userId = user._id;
+  //     console.log(user);
+  //   });
+  //   console.log(socket);
+  //   // put the current user first, and then sort by username
+  //   users = users.sort((a: any, b: any) => {
+  //     if (a.self) return -1;
+  //     if (b.self) return 1;
+  //     if (a.username < b.username) return -1;
+  //     return a.username > b.username ? 1 : 0;
+  //   });
+  // });
 
   socket.on("user connected", (user: any) => {
     // initReactiveProperties(user);

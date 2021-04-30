@@ -9,7 +9,6 @@ import { Server, Socket } from "socket.io";
 const http = require("http");
 const socket = require("socket.io");
 
-
 const app = express();
 app.use(cors());
 
@@ -59,14 +58,12 @@ io.on("connection", (socket: any) => {
 });
 
 io.on("connection", (socket: any) => {
-  socket.on("private message",async ({ sender, content, receiver }: any) => {
-    io.to(receiver).emit(content);
-    
-    // TODO: check this out 
-    // const user = await UserModel.findOne({ sender });
-    MessagesModel.create({ sender, receiver, content })
+  socket.on("private message", async ({ sender, content, receiver }: any) => {
+    MessagesModel.create({ sender, receiver, content }).then(() => {
+      io.to(receiver).emit(content);
+   });
     console.log(sender, content, receiver, "data stored in mongodb ");
-    
+
     // await messages.create({})
   });
 });
@@ -118,9 +115,16 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// getting all the data from mongo
+// getting all the user data from mongo
 app.get("/data", async (req, res) => {
   UserModel.find({}, (err, result) => {
+    err ? res.send(err) : res.send(result);
+    console.log(result);
+  });
+});
+
+app.get("/messages", async (req, res) => {
+  MessagesModel.find({}, (err, result) => {
     err ? res.send(err) : res.send(result);
     console.log(result);
   });

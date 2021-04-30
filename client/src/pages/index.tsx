@@ -7,6 +7,7 @@ interface PropTypes {
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   filteredUsers: any;
   searchField: string;
+  messagesData: [{}],
 }
 
 const Home = (props: PropTypes) => {
@@ -36,7 +37,7 @@ const Home = (props: PropTypes) => {
           <Contacts filteredUsers={props.filteredUsers} />
         </div>
         <div className="flex-grow">
-          <ChatScreen />
+          <ChatScreen messagesData={props.messagesData} />
         </div>
         <div className="w-1/4">
           <SelectedContactInfo />
